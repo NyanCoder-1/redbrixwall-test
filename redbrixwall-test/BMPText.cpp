@@ -90,6 +90,8 @@ BMPText::TAtlas BMPText::prepareAtlas(const std::u32string &string)
 		// accumulate atlas size and list
 		for (auto font : fonts)
 		{
+			if (!font)
+				continue;
 			auto glyph = font->getCharacter(character);
 			if (!glyph)
 				continue;

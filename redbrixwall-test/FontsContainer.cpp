@@ -27,9 +27,9 @@ namespace {
 
 void FontsContainer::Init()
 {
-	auto unifontData = readFile("./assets/fonts/unifont_all-15.0.05.bin");
+	//auto unifontData = readFile("./assets/fonts/unifont_all-15.0.05.bin");
 	auto mcFontData = readFile("./assets/fonts/minecraftFont-default.bin");
-	fontUnifont = std::make_shared<BMPFont>(unifontData.data(), unifontData.size());
+	//fontUnifont = std::make_shared<BMPFont>(unifontData.data(), unifontData.size());
 	fontMc = std::make_shared<BMPFont>(mcFontData.data(), mcFontData.size());
 }
 

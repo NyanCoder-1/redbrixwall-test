@@ -1,9 +1,12 @@
-#define WIN32_LEAN_AND_MEAN
+﻿#define WIN32_LEAN_AND_MEAN
 // I prefer using std::min/std::max from <algorithm>
 #define NOMINMAX
 #include <Windows.h>
+#include <windowsx.h>
 #include <iostream>
 #include <memory>
+#include <functional>
+#include <chrono>
 #include "Render.h"
 
 #include "Text.h"
@@ -11,6 +14,7 @@
 #include "CylinderMesh.h"
 #include "ShadowMesh.h"
 #include "ArrowMesh.h"
+#include "Button.h"
 
 #include "Logic.h"
 
@@ -20,6 +24,18 @@ const wchar_t* wndClassName = L"redbrixwall-test[window]";
 const wchar_t* wndTitle = L"redbrixwall-test: The Archers";
 HWND hWnd = nullptr;
 std::unique_ptr<Render> render;
+std::function<void(int32_t x, int32_t y)> onMouseMove;
+std::function<void(int32_t x, int32_t y)> onClick;
+typedef std::chrono::high_resolution_clock Time;
+typedef std::chrono::duration<float> fsec;
+
+enum class eSimulationMode
+{
+    Step,
+    Sync,
+    Fastest
+};
+eSimulationMode simMode = eSimulationMode::Sync;
 
 bool PrepareWindow();
 
@@ -48,6 +64,66 @@ int main(int argc, char** argv)
     team1Count.SetPosition(50 + maxWidth, 41);
     team2Count.SetPosition(50 + maxWidth, 71);
 
+    float elapsedTime = 0;
+    auto lastTime = Time::now();
+
+    //⏯▶⏩
+    Button btnOnceAtSecond(render.get());
+    btnOnceAtSecond.SetText(U"⏯");
+    btnOnceAtSecond.SetPosition(1280 - 27 * 3, 3);
+    btnOnceAtSecond.SetSize(24, 21);
+    Button btnSync(render.get());
+    btnSync.SetText(U"▶");
+    btnSync.SetPosition(1280 - 27 * 2, 3);
+    btnSync.SetSize(24, 21);
+    btnSync.SetActive();
+    Button btnFastest(render.get());
+    btnFastest.SetText(U"⏩");
+    btnFastest.SetPosition(1280 - 27, 3);
+    btnFastest.SetSize(24, 21);
+    btnOnceAtSecond.SetOnClick([&]() {
+        if (simMode != eSimulationMode::Step)
+        {
+            simMode = eSimulationMode::Step;
+            btnOnceAtSecond.SetActive();
+            btnSync.SetInactive();
+            btnFastest.SetInactive();
+            elapsedTime = 0;
+        }
+        });
+    btnSync.SetOnClick([&]() {
+        if (simMode != eSimulationMode::Sync)
+        {
+            simMode = eSimulationMode::Sync;
+            btnOnceAtSecond.SetInactive();
+            btnSync.SetActive();
+            btnFastest.SetInactive();
+            elapsedTime = 0;
+        }
+        });
+    btnFastest.SetOnClick([&]() {
+        if (simMode != eSimulationMode::Fastest)
+        {
+            simMode = eSimulationMode::Fastest;
+            btnOnceAtSecond.SetInactive();
+            btnSync.SetInactive();
+            btnFastest.SetActive();
+            elapsedTime = 0;
+        }
+        });
+    onMouseMove = [&](int32_t x, int32_t y) {
+        for (auto btn : { &btnOnceAtSecond, &btnSync, &btnFastest })
+        {
+            btn->MouseMove(x, y);
+        }
+    };
+    onClick = [&](int32_t x, int32_t y) {
+        for (auto btn : { &btnOnceAtSecond, &btnSync, &btnFastest })
+        {
+            btn->MouseClick(x, y);
+        }
+    };
+
     Logic logic;
 
     MSG msg = { 0 };
@@ -61,7 +137,37 @@ int main(int argc, char** argv)
         }
         else
         {
-            logic.Update();
+            float deltaTime = 0;
+            {
+                auto now = Time::now();
+                deltaTime = fsec(now - lastTime).count();
+                lastTime = now;
+            }
+            elapsedTime += deltaTime;
+            bool needToUpdate = false;
+            switch (simMode)
+            {
+            case eSimulationMode::Fastest:
+                needToUpdate = true;
+                elapsedTime = 0;
+                break;
+            case eSimulationMode::Sync:
+                if (elapsedTime > simulationStep)
+                {
+                    elapsedTime -= simulationStep;
+                    needToUpdate = true;
+                }
+                break;
+            case eSimulationMode::Step:
+                if (elapsedTime > 1.0f)
+                {
+                    elapsedTime -= 1.0f;
+                    needToUpdate = true;
+                }
+                break;
+            }
+            if (needToUpdate)
+                logic.Update();
             
             // Set team count text
             {
@@ -149,6 +255,8 @@ int main(int argc, char** argv)
                     team2Name.Draw();
                     team1Count.Draw();
                     team2Count.Draw();
+                    for (auto btn : { &btnOnceAtSecond, &btnSync, &btnFastest })
+                        btn->Draw();
                 });
         }
     }
@@ -195,6 +303,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 
     case WM_DESTROY:
         PostQuitMessage(0);
+        break;
+
+    case WM_MOUSEMOVE:
+        if (onMouseMove)
+        {
+            onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        }
+        break;
+
+    case WM_LBUTTONDOWN:
+        if (onClick)
+        {
+            onClick(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+        }
         break;
 
     default:

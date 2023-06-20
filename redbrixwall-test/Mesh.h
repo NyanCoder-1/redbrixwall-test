@@ -26,7 +26,7 @@ protected:
 	uint32_t indicesCount = 0;
 };
 
-template <typename TVertex> class Mesh : protected MeshBase
+template <typename TVertex> class Mesh : public MeshBase
 {
 public:
 	Mesh(Render* render);
@@ -36,17 +36,15 @@ public:
 	void UpdateGeometry(const std::vector<TVertex>& vertices, const std::vector<uint32_t>& indices);
 };
 
-class MeshColored : protected Mesh<TVertexColored>
+class MeshColored : public Mesh<TVertexColored>
 {
 public:
 	MeshColored(Render* render, const std::vector<TVertexColored>& vertices, const std::vector<uint32_t>& indices);
 
 	void Draw() override;
-
-protected:
 };
 
-class MeshTextured : protected Mesh<TVertexTextured>
+class MeshTextured : public Mesh<TVertexTextured>
 {
 public:
 	MeshTextured(Render* render, const std::vector<TVertexTextured>& vertices, const std::vector<uint32_t>& indices, ComPtr<ID3D11ShaderResourceView> texture);

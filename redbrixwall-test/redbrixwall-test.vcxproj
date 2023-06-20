@@ -151,6 +151,7 @@
     <ClCompile Include="BMPFont.cpp" />
     <ClCompile Include="BMPText.cpp" />
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="CylinderMesh.cpp" />
     <ClCompile Include="DrawablePrimitive.cpp" />
     <ClCompile Include="FieldMesh.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="BMPFont.h" />
     <ClInclude Include="BMPText.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="CylinderMesh.h" />
     <ClInclude Include="DrawablePrimitive.h" />
     <ClInclude Include="FieldMesh.h" />

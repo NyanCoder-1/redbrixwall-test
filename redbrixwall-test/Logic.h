@@ -45,6 +45,7 @@ float Length(Position vec);
 std::optional<Velocity> Aim(Position me, Position target);
 
 // constants declaration
+extern const float simulationStep;
 extern const std::array<std::array<float, 4>, 2> teamsColors;
 extern const uint32_t archersCount;
 extern const Position team1Position;

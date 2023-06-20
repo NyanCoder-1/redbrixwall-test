@@ -6,6 +6,7 @@
 #define M_PI       3.14159265358979323846
 
 // constants definition
+const float simulationStep = 0.05f;
 const std::array<std::array<float, 4>, 2> teamsColors = {
 	std::array<float, 4>{ 0.784f, 0.298f, 0.259f, 1.0f },
 	std::array<float, 4>{ 0.255f, 0.49f, 0.867f, 1.0f },
@@ -41,7 +42,7 @@ Logic::Logic()
 }
 void Logic::Update()
 {
-	float dTime = 0.05f;
+	float dTime = simulationStep;
 
 	switch (simulationState)
 	{
