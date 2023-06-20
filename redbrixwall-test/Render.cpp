@@ -1,12 +1,10 @@
 ﻿#include "render.h"
 #include <array>
 #include "Buffer.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
-#include "Text.h"
-#include "Mesh.h"
+#include "FontsContainer.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "SamplerState.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -67,6 +65,26 @@ ID3D11DeviceContext* Render::GetDeviceContext() const
 	return ctx.Get();
 }
 
+void Render::DisableDepthStencil()
+{
+	ctx->OMSetDepthStencilState(depthDisabledStencilState.Get(), 0);
+}
+
+void Render::EnableDepthStencil()
+{
+	ctx->OMSetDepthStencilState(depthStencilState.Get(), 0);
+}
+
+void Render::DrawModeLines()
+{
+	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+}
+
+void Render::DrawModeTriangles()
+{
+	ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
 Shader* Render::GetShaderColored() const
 {
 	return shaderColored.get();
@@ -75,6 +93,11 @@ Shader* Render::GetShaderColored() const
 Shader* Render::GetShaderTextured() const
 {
 	return shaderTextured.get();
+}
+
+Shader* Render::GetShaderShadow() const
+{
+	return shaderShadow.get();
 }
 
 const FontsContainer* Render::GetFontsContainer() const
@@ -245,6 +268,11 @@ void Render::InitShaders()
 	shaderColored->AddInputElementDesc("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
 	shaderColored->AddInputElementDesc("COLOR", DXGI_FORMAT_R32G32B32A32_FLOAT);
 	shaderColored->CreateShader(const_cast<wchar_t*>(L".\\assets\\shaders\\colored-vs.hlsl"), const_cast<wchar_t*>(L".\\assets\\shaders\\colored-ps.hlsl"));
+	
+	shaderShadow = std::make_shared<Shader>(this);
+	shaderShadow->AddInputElementDesc("POSITION", DXGI_FORMAT_R32G32B32_FLOAT);
+	shaderShadow->AddInputElementDesc("TEXCOORD", DXGI_FORMAT_R32G32_FLOAT);
+	shaderShadow->CreateShader(const_cast<wchar_t*>(L".\\assets\\shaders\\textured-vs.hlsl"), const_cast<wchar_t*>(L".\\assets\\shaders\\shadow-ps.hlsl"));
 }
 
 void Render::InitRasterizerState()
@@ -255,28 +283,6 @@ void Render::InitRasterizerState()
 	// create new rasterizer state
 	device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
 }
-
-namespace {
-	std::vector<uint8_t> readFile(const char* filename)
-	{
-		// open the file:
-		std::streampos fileSize;
-		std::ifstream file(filename, std::ios::binary | std::ios::ate);
-		if (!file.is_open()) {
-			std::cout << "Failed to open the file " << filename << std::endl;
-			return {};
-		}
-
-		// get its size:
-		fileSize = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		// read the data:
-		std::vector<uint8_t> fileData(fileSize, 0);
-		file.read((char*)fileData.data(), fileSize);
-		return fileData;
-	}
-};
 
 void Render::InitGeometry()
 {

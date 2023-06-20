@@ -1,6 +1,7 @@
 #include "FontsContainer.h"
 #include <fstream>
 #include <iostream>
+#include "BMPFont.h"
 
 namespace {
 	std::vector<uint8_t> readFile(const char* filename)

@@ -5,41 +5,55 @@
 #include <d3d11.h>
 #include <cstdint>
 #include <vector>
+#include <DirectXMath.h>
 #include "types.h"
 
-template <typename TVertex> class Mesh : public DrawablePrimitive
+class MeshBase : public DrawablePrimitive
 {
 public:
 	template<typename T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 public:
-	Mesh(Render* render);
+	MeshBase(Render* render);
 
-	void Draw() override;
+	void UpdateMatrixFor2D(DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity());
+	void UpdateMatrixFor3D(DirectX::XMMATRIX matrix = DirectX::XMMatrixIdentity());
 
 protected:
-	ComPtr<ID3D11Buffer> textVertexBuffer;
-	ComPtr<ID3D11Buffer> textIndexBuffer;
+	ComPtr<ID3D11Buffer> vertexBuffer;
+	ComPtr<ID3D11Buffer> indexBuffer;
 	ComPtr<ID3D11Buffer> constBuffer;
 	uint32_t indicesCount = 0;
 };
 
-class MeshColored : public Mesh<TVertexColored>
+template <typename TVertex> class Mesh : protected MeshBase
 {
 public:
-	MeshColored(Render* render, std::vector<TVertexColored> vertices, std::vector<uint32_t> indices);
+	Mesh(Render* render);
+
+	void Draw() override;
+
+	void UpdateGeometry(const std::vector<TVertex>& vertices, const std::vector<uint32_t>& indices);
+};
+
+class MeshColored : protected Mesh<TVertexColored>
+{
+public:
+	MeshColored(Render* render, const std::vector<TVertexColored>& vertices, const std::vector<uint32_t>& indices);
 
 	void Draw() override;
 
 protected:
 };
 
-class MeshTextured : public Mesh<TVertexTextured>
+class MeshTextured : protected Mesh<TVertexTextured>
 {
 public:
-	MeshTextured(Render* render, std::vector<TVertexTextured> vertices, std::vector<uint32_t> indices, ComPtr<ID3D11ShaderResourceView> texture);
+	MeshTextured(Render* render, const std::vector<TVertexTextured>& vertices, const std::vector<uint32_t>& indices, ComPtr<ID3D11ShaderResourceView> texture);
 
 	void Draw() override;
+
+	void SetTexture(ComPtr<ID3D11ShaderResourceView> texture);
 
 protected:
 	ComPtr<ID3D11ShaderResourceView> texture;

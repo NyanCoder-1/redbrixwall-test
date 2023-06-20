@@ -24,7 +24,7 @@ struct TVertexColored
 	};
 	union
 	{
-		float color[2];
+		float color[4];
 		struct
 		{
 			float r, g, b, a;

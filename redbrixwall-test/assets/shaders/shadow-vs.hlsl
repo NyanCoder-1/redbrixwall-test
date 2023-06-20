@@ -19,7 +19,7 @@ VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
     
-    output.pos = mul(mat, input.pos); //float4(input.pos.x / 640.0f, input.pos.y / 360.0f, 0, 1); //mul(input.pos, mat) / 100.0f;
+    output.pos = mul(mat, input.pos);
     output.uv = input.uv;
 
     return output;

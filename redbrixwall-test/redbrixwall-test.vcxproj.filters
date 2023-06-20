@@ -54,6 +54,18 @@
     <ClCompile Include="FieldMesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Logic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CylinderMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ArrowMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Render.h">
@@ -95,11 +107,25 @@
     <ClInclude Include="FieldMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Logic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CylinderMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrowMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="assets\shaders\textured-vs.hlsl" />
     <FxCompile Include="assets\shaders\textured-ps.hlsl" />
     <FxCompile Include="assets\shaders\colored-vs.hlsl" />
     <FxCompile Include="assets\shaders\colored-ps.hlsl" />
+    <FxCompile Include="assets\shaders\shadow-ps.hlsl" />
+    <FxCompile Include="assets\shaders\shadow-vs.hlsl" />
   </ItemGroup>
 </Project>

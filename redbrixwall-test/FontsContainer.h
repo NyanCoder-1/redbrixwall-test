@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "BMPFont.h"
+
+class BMPFont;
 
 class FontsContainer
 {

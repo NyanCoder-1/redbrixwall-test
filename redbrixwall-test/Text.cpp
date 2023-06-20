@@ -4,10 +4,15 @@
 #include "Buffer.h"
 #include <DirectXMath.h>
 #include "Texture.h"
+#include "Shader.h"
 
 Text::Text(Render* render, std::u32string string, bool useBufferedCharCollection) :
-	DrawablePrimitive(render), indicesCount(0)
+	MeshTextured(render, {}, {}, nullptr), indicesCount(0)
 {
+	minX = 0;
+	maxX = 0;
+	minY = 0;
+	maxY = 0;
 	textGenerator = std::make_unique<BMPText>(std::vector<const BMPFont*>{ render->GetFontsContainer()->GetMinecraft(), render->GetFontsContainer()->GetUnifont() });
 	textGenerator->setSizeMultiplier(render->GetFontsContainer()->GetUnifont(), 2.0f);
 	textGenerator->setSizeMultiplier(render->GetFontsContainer()->GetMinecraft(), 3.0f);
@@ -15,52 +20,30 @@ Text::Text(Render* render, std::u32string string, bool useBufferedCharCollection
 	{
 		charCollection = textGenerator->prepareAtlas(string);
 		auto textMesh = textGenerator->createTextFromAtlas(charCollection.value(), string);
-		textVertexBuffer = Buffer::CreateVertexBuffer(render->GetDevice(), static_cast<int>(sizeof(TVertexTextured) * textMesh.vertices.size()), false, textMesh.vertices.data());
-		textIndexBuffer = Buffer::CreateIndexBuffer(render->GetDevice(), static_cast<int>(sizeof(uint32_t) * textMesh.indices.size()), false, textMesh.indices.data());
-		indicesCount = static_cast<int32_t>(textMesh.indices.size());
-
-		textTexture = Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(charCollection.value().textureData.data()), charCollection.value().width, charCollection.value().height);
+		UpdateBoundaries(textMesh.vertices, minX, maxX, minY, maxY);
+		UpdateGeometry(textMesh.vertices, textMesh.indices);
+		SetTexture(Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(charCollection.value().textureData.data()), charCollection.value().width, charCollection.value().height));
 	}
 	else
 	{
 		auto textMesh = textGenerator->createText(string);
-		textVertexBuffer = Buffer::CreateVertexBuffer(render->GetDevice(), static_cast<int>(sizeof(TVertexTextured) * textMesh.vertices.size()), false, textMesh.vertices.data());
-		textIndexBuffer = Buffer::CreateIndexBuffer(render->GetDevice(), static_cast<int>(sizeof(uint32_t) * textMesh.indices.size()), false, textMesh.indices.data());
-		indicesCount = static_cast<int32_t>(textMesh.indices.size());
-
-		textTexture = Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(textMesh.textureData.data()), textMesh.textureWidth, textMesh.textureHeight);
+		UpdateBoundaries(textMesh.vertices, minX, maxX, minY, maxY);
+		UpdateGeometry(textMesh.vertices, textMesh.indices);
+		SetTexture(Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(textMesh.textureData.data()), textMesh.textureWidth, textMesh.textureHeight));
 	}
-	constBuffer = Buffer::CreateConstantBuffer(render->GetDevice(), sizeof(DirectX::XMMATRIX) * 2, false);
-	struct {
-		DirectX::XMMATRIX mat;
-		DirectX::XMMATRIX matWorld;
-	} constBuff;
-	constBuff.mat = render->GetMatrixUI();
-	constBuff.matWorld = DirectX::XMMatrixIdentity();
-	render->GetDeviceContext()->UpdateSubresource(constBuffer.Get(), 0, nullptr, &constBuff, 0, 0);
+	UpdateMatrixFor2D();
 }
 
 void Text::Draw()
 {
 	render->GetShaderTextured()->Draw();
-	unsigned int stride = sizeof(TVertexTextured);
-	unsigned int offset = 0;
-	render->GetDeviceContext()->IASetVertexBuffers(0, 1, textVertexBuffer.GetAddressOf(), &stride, &offset);
-	render->GetDeviceContext()->IASetIndexBuffer(textIndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	render->GetDeviceContext()->VSSetConstantBuffers(0, 1, constBuffer.GetAddressOf());
-	render->GetDeviceContext()->PSSetShaderResources(0, 1, textTexture.GetAddressOf());
-	render->GetDeviceContext()->DrawIndexed(indicesCount, 0, 0);
+	MeshTextured::Draw();
 }
 
 void Text::SetPosition(float x, float y)
 {
-	struct {
-		DirectX::XMMATRIX mat;
-		DirectX::XMMATRIX matWorld;
-	} constBuff;
-	constBuff.mat = DirectX::XMMatrixTranslation(x, y, 0) * render->GetMatrixUI();
-	constBuff.matWorld = DirectX::XMMatrixTranslation(x, y, 0);
-	render->GetDeviceContext()->UpdateSubresource(constBuffer.Get(), 0, nullptr, &constBuff, 0, 0);
+	UpdateMatrixFor2D(DirectX::XMMatrixTranslation(x, y, 0));
 }
 
 void Text::SetText(std::u32string text)
@@ -68,16 +51,60 @@ void Text::SetText(std::u32string text)
 	if (charCollection.has_value())
 	{
 		auto textMesh = textGenerator->createTextFromAtlas(charCollection.value(), text);
-		textVertexBuffer = Buffer::CreateVertexBuffer(render->GetDevice(), static_cast<int>(sizeof(TVertexTextured) * textMesh.vertices.size()), false, textMesh.vertices.data());
-		textIndexBuffer = Buffer::CreateIndexBuffer(render->GetDevice(), static_cast<int>(sizeof(uint32_t) * textMesh.indices.size()), false, textMesh.indices.data());
-		indicesCount = static_cast<int32_t>(textMesh.indices.size());
+		UpdateBoundaries(textMesh.vertices, minX, maxX, minY, maxY);
+		UpdateGeometry(textMesh.vertices, textMesh.indices);
 	}
 	else
 	{
 		auto textMesh = textGenerator->createText(text);
-		textVertexBuffer = Buffer::CreateVertexBuffer(render->GetDevice(), static_cast<int>(sizeof(TVertexTextured) * textMesh.vertices.size()), false, textMesh.vertices.data());
-		textIndexBuffer = Buffer::CreateIndexBuffer(render->GetDevice(), static_cast<int>(sizeof(uint32_t) * textMesh.indices.size()), false, textMesh.indices.data());
-		indicesCount = static_cast<int32_t>(textMesh.indices.size());
-		textTexture = Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(textMesh.textureData.data()), textMesh.textureWidth, textMesh.textureHeight);
+		UpdateBoundaries(textMesh.vertices, minX, maxX, minY, maxY);
+		UpdateGeometry(textMesh.vertices, textMesh.indices);
+		SetTexture(Texture::CreateTextureFromMemory(render, reinterpret_cast<uint8_t*>(textMesh.textureData.data()), textMesh.textureWidth, textMesh.textureHeight));
+	}
+}
+
+float Text::GetMinX() const
+{
+	return minX;
+}
+
+float Text::GetMaxX() const
+{
+	return maxX;
+}
+
+float Text::GetMinY() const
+{
+	return minY;
+}
+
+float Text::GetMaxY() const
+{
+	return maxY;
+}
+
+float Text::GetWidth() const
+{
+	return maxX - minX;
+}
+
+float Text::GetHeight() const
+{
+	return maxY - minY;
+}
+
+void Text::UpdateBoundaries(const std::vector<TVertexTextured>& vertices, float& minX, float& maxX, float& minY, float& maxY)
+{
+	if (!vertices.empty())
+	{
+		minX = maxX = vertices.front().x;
+		minY = maxY = vertices.front().y;
+	}
+	for (const auto& vertex : vertices)
+	{
+		minX = std::fminf(vertex.x, minX);
+		maxX = std::fmaxf(vertex.x, minX);
+		minY = std::fminf(vertex.y, minY);
+		maxY = std::fmaxf(vertex.y, minY);
 	}
 }

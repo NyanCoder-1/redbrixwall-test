@@ -10,19 +10,11 @@
 #include <cstdint>
 #include <utility>
 #include <memory>
-#include "Shader.h"
-#include "Texture.h"
-#include "SamplerState.h"
-#include "BMPFont.h"
-#include "BMPText.h"
-#include "FontsContainer.h"
 #include <functional>
 
-
-class FieldMesh;
-
-class Text;
-class MeshColored;
+class Shader;
+class FontsContainer;
+class SamplerState;
 
 class Render
 {
@@ -39,8 +31,14 @@ public:
 	ID3D11Device* GetDevice() const;
 	ID3D11DeviceContext* GetDeviceContext() const;
 
+	void DisableDepthStencil();
+	void EnableDepthStencil();
+	void DrawModeLines();
+	void DrawModeTriangles();
+
 	Shader* GetShaderColored() const;
 	Shader* GetShaderTextured() const;
+	Shader* GetShaderShadow() const;
 	const FontsContainer* GetFontsContainer() const;
 	const DirectX::XMMATRIX GetMatrixUI() const;
 	const DirectX::XMMATRIX GetMatrixViewProjection() const;
@@ -72,6 +70,7 @@ private:
 	std::unique_ptr<FontsContainer> fontsContainer;
 	std::shared_ptr<Shader> shaderTextured;
 	std::shared_ptr<Shader> shaderColored;
+	std::shared_ptr<Shader> shaderShadow;
 	std::shared_ptr<SamplerState> samplerState;
 	DirectX::XMMATRIX matrixOrtho;
 	DirectX::XMMATRIX matrixIsometric;

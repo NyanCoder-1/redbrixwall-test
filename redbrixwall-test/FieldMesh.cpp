@@ -12,26 +12,26 @@ FieldMeshDataInitializer::FieldMeshDataInitializer()
 	{
 		for (int32_t x = 0; x < 20; x++)
 		{
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 0) * 4 + 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 1) * 4 - 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 1) * 4 - 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.0f, 0.071f, 0.306f, 0.271f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 0) * 4 + 0.15f, -0.0f, 0.071f, 0.306f, 0.271f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.071f, 0.306f, 0.271f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.071f, 0.306f, 0.271f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.271f, 0.263f, 0.208f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.271f, 0.263f, 0.208f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -1.0f, 0.271f, 0.263f, 0.208f, 1.0f);
-			vertices.emplace_back((x + 1) * 4 - 0.15f, (y + 0) * 4 + 0.15f, -1.0f, 0.271f, 0.263f, 0.208f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 1) * 4 - 0.15f, -0.0f, 0.220f, 0.475f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.0f, 0.220f, 0.475f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 1) * 4 - 0.15f, -0.5f, 0.220f, 0.475f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.220f, 0.475f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 1) * 4 - 0.15f, -0.5f, 0.463f, 0.478f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -0.5f, 0.463f, 0.478f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 1) * 4 - 0.15f, -1.0f, 0.463f, 0.478f, 0.416f, 1.0f);
-			vertices.emplace_back((x + 0) * 4 + 0.15f, (y + 0) * 4 + 0.15f, -1.0f, 0.463f, 0.478f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 0) * 5 + 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 1) * 5 - 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 1) * 5 - 0.15f, 0.0f, 0.333f, 0.71f, 0.655f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.0f, 0.071f, 0.306f, 0.271f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 0) * 5 + 0.15f, -0.0f, 0.071f, 0.306f, 0.271f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.071f, 0.306f, 0.271f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.071f, 0.306f, 0.271f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.271f, 0.263f, 0.208f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.271f, 0.263f, 0.208f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -1.0f, 0.271f, 0.263f, 0.208f, 1.0f);
+			vertices.emplace_back((x + 1) * 5 - 0.15f, (y + 0) * 5 + 0.15f, -1.0f, 0.271f, 0.263f, 0.208f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 1) * 5 - 0.15f, -0.0f, 0.220f, 0.475f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.0f, 0.220f, 0.475f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 1) * 5 - 0.15f, -0.5f, 0.220f, 0.475f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.220f, 0.475f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 1) * 5 - 0.15f, -0.5f, 0.463f, 0.478f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -0.5f, 0.463f, 0.478f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 1) * 5 - 0.15f, -1.0f, 0.463f, 0.478f, 0.416f, 1.0f);
+			vertices.emplace_back((x + 0) * 5 + 0.15f, (y + 0) * 5 + 0.15f, -1.0f, 0.463f, 0.478f, 0.416f, 1.0f);
 
 			int index = x + y * 20;
 
